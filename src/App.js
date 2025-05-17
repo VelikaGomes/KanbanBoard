@@ -7,6 +7,7 @@ const columns = ["to do", "in progress", "done"];
 function App() {
   const [tasks, settasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [dragTask, setDraggedTask] = useState(null);
 
   const addTask = async () => {
     if (!newTaskTitle) return;
@@ -17,8 +18,7 @@ function App() {
       .select();
 
     if (error) {
-      alert("Error inserting task: " + error.message);
-      console.error(error);
+      alert("Error inserting task.");
       return;
     }
 
@@ -26,11 +26,34 @@ function App() {
     setNewTaskTitle("");
   };
 
+  function DragStart(task) {
+    setDraggedTask(task);
+  }
+
+  async function Drop(status) {
+    if(!dragTask) return;
+
+    const{ data, error }= await supabase
+    .from("Tasks")
+    .update({status})
+    .eq("id", dragTask.id)
+    .select();
+
+    if(error){
+      alert("error updating task");
+    }
+
+    settasks((prev) =>
+    prev.map((t) => (t.id===dragTask.id ? {...t, status } :t))
+  );
+  setDraggedTask(null);
+  }
+
   useEffect(() => {
     async function fetchTasks() {
       const { data, error } = await supabase.from("Tasks").select("*");
       if (error) {
-        alert("Error fetching tasks: " + error.message);
+        alert("Error fetching tasks: ");
         return;
       }
       settasks(data);
@@ -40,7 +63,7 @@ function App() {
   }, []);
 
   return (
-    <div style={{ font: "sans-serif", padding: "20px" }}>
+    <div style={{ font: "sans-serif", padding: "20px", backgroundColor:"white"}}>
       <h1 style={{ textAlign: "center" }}> Kanban Board</h1>
       <div
         style={{
@@ -49,19 +72,16 @@ function App() {
           display: "flex",
           alignItems: "center",
           gap: "30px",
-        }}
-      >
+        }}>
         <input
           type="text"
-          placeholder="New task..."
+          placeholder="Add new task here"
           value={newTaskTitle}
           onChange={(e) => setNewTaskTitle(e.target.value)}
           style={{
-            padding: "10px",
-            fontSize: "15px",
+            padding: "10px",  fontSize: "15px",
             border: "1px solid rgb(0, 0, 0)",
-            width: "300px",
-            height:"30px",
+            width: "400px",  height: "20px",
             borderRadius: "5px",
           }}
         />
@@ -71,25 +91,23 @@ function App() {
             padding: "10px",
             backgroundColor: "#640D14",
             color: "white",
-            height:"47px",
-            width:"100px",
-            fontWeight:"bold",
+            height: "40px", minwidth: "250px",
+            fontWeight: "bold",
             borderRadius: "5px",
-          }}
-        >
-          Add Task
+          }}>Add Task
         </button>
+
       </div>
       <div style={{ display: "flex", gap: "15px", justifyContent: "center" }}>
         {columns.map((column) => (
           <div
-            key={column}
+            key={column} onDragOver={(e) => e.preventDefault()}
+            onDrop={() =>Drop(column)}
             style={{
-              backgroundColor: "white",
+              backgroundColor: "#eee",
               minWidth: "200px",
-              padding: "10px",
-              border: "1px solid black",
-              borderRadius: "5px",
+              width:"300px",padding: "10px",
+              borderRadius: "8px",
               display: "flex",
               flexDirection: "column",
             }}
@@ -100,14 +118,13 @@ function App() {
               .map((task) => (
                 <div
                   key={task.id}
+                  draggable onDragStart={() => DragStart(task)}
                   style={{
-                    backgroundColor: "#f9f9f9",
+                    backgroundColor: "white",
                     margin: "5px 0",
                     padding: "8px",
                     borderRadius: "3px",
-                    boxShadow: "0 0 3px black",
-                  }}
-                >
+                    boxShadow:"1px #ddd",}}>
                   {task.title}
                 </div>
               ))}
