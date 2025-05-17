@@ -12,7 +12,7 @@ function App() {
   if (!newTaskTitle) return;
 
   const { data, error } = await supabase
-    .from("tasks")
+    .from("Tasks")
     .insert([{ title: newTaskTitle, status: "to do" }])
     .select();
 
