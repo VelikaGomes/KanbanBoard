@@ -33,7 +33,7 @@ function App() {
   async function Drop(status) {
     if(!dragTask) return;
 
-    const{ data, error }= await supabase
+    const{error }= await supabase
     .from("Tasks")
     .update({status})
     .eq("id", dragTask.id)
