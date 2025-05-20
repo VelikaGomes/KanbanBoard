@@ -89,6 +89,7 @@ function App() {
           onClick={addTask}
           style={{
             padding: "10px",
+            flexDirection: "column",
             backgroundColor: "#640D14",
             color: "white",
             height: "40px", minwidth: "250px",
@@ -98,7 +99,7 @@ function App() {
         </button>
 
       </div>
-      <div style={{ display: "flex", gap: "15px", justifyContent: "center" }}>
+      <div style={{ display: "flex", gap: "15px", justifyContent: "center" , flexWrap:"wrap" }}>
         {columns.map((column) => (
           <div
             key={column} onDragOver={(e) => e.preventDefault()}
@@ -106,7 +107,8 @@ function App() {
             style={{
               backgroundColor: "#eee",
               minWidth: "200px",
-              width:"300px",padding: "10px",
+              width:"100%",
+              maxWidth:"300px",padding: "10px",
               borderRadius: "8px",
               display: "flex",
               flexDirection: "column",
