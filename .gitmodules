@@ -1,0 +1,3 @@
+[submodule "KanbanBoard"]
+	path = KanbanBoard
+	url = https://github.com/VelikaGomes/KanbanBoard.git
